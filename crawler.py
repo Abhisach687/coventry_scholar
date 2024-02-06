@@ -61,18 +61,18 @@ def crawl_and_index():
 
 def search(query):
     ix = open_dir(index_path)
-    finalResult = []
+    final_results = []
     with ix.searcher(weighting=scoring.TF_IDF()) as searcher:
         query_parser = QueryParser("title", ix.schema)
         query = query_parser.parse(query)
         results = searcher.search(query, terms=True)
         for result in results:
-            finalResult.append({
+            final_results.append({
                 "title": result['title'],
-                "Authors": result['authors'],
-                "Year": result['year'],
+                "authors": result['authors'],
+                "year": result['year'],
                 "publication_url": result['publication_url'],
                 "profile_url": result['author_profile_url'],
             })
 
-    return finalResult
+    return final_results
