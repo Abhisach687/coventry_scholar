@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Results</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Results</h1>
+    <table>
+      <tr>
+        <th>Title</th>
+        <th>Authors</th>
+        <th>Year</th>
+        <th>Publication Url</th>
+        <th>Profile Url</th>
+      </tr>
+      {% for result in results %}
+      <tr>
+        <td>{{ result.title }}</td>
+        <td>{{ result.authors }}</td>
+        <td>{{ result.year }}</td>
+        <td>
+          {% if result.publication_url != "N/A" %}
+          <a href="{{ result.publication_url }}">Link</a>
+          {% else %} N/A {% endif %}
+        </td>
+        <td><a href="{{ result.profile_url }}">Link</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
