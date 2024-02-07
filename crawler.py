@@ -6,12 +6,13 @@ from urllib.parse import urljoin
 from whoosh.fields import Schema, TEXT, ID
 from whoosh.index import create_in, open_dir
 from whoosh.qparser import QueryParser
+from whoosh.qparser import MultifieldParser
 from whoosh import scoring
 
 base_url = "https://pureportal.coventry.ac.uk/en/organisations/centre-for-health-and-life-sciences"
 index_path = "indexdir"
 
-def crawl_and_index():
+def gather_and_store():
     # Fetch the page containing the list of publications
     response = requests.get(base_url)
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -38,7 +39,7 @@ def crawl_and_index():
         year_tag = publication_div.find('span', class_='date')
         year = year_tag.text.strip() if year_tag else "N/A"
 
-        publication_url_tag = publication_div.find('a', class_='title')
+        publication_url_tag = publication_div.find('a', class_='link')
         publication_url = urljoin(base_url, publication_url_tag['href']) if publication_url_tag else "N/A"
 
         author_profile_url_tag = publication_div.find('a', class_='link person')
@@ -59,11 +60,11 @@ def crawl_and_index():
     writer.commit()
     return results
 
-def search(query):
+def search_publications(query):
     ix = open_dir(index_path)
     final_results = []
     with ix.searcher(weighting=scoring.TF_IDF()) as searcher:
-        query_parser = QueryParser("title", ix.schema)
+        query_parser = MultifieldParser(["title", "authors"], ix.schema)
         query = query_parser.parse(query)
         results = searcher.search(query, terms=True)
         for result in results:
