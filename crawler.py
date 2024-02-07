@@ -8,13 +8,23 @@ from whoosh.index import create_in, open_dir
 from whoosh.qparser import QueryParser
 from whoosh.qparser import MultifieldParser
 from whoosh import scoring
+import time
+import robotexclusionrulesparser
 
 base_url = "https://pureportal.coventry.ac.uk/en/organisations/centre-for-health-and-life-sciences"
 index_path = "indexdir"
 
+rerp = robotexclusionrulesparser.RobotExclusionRulesParser()
+
 def gather_and_store():
     # Fetch the page containing the list of publications
     response = requests.get(base_url)
+    rerp.parse(response.text)
+    
+    if rerp.is_allowed("*", base_url):
+        # Fetch the page
+        response = requests.get(base_url)
+    
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Initialize Whoosh index
@@ -58,6 +68,7 @@ def gather_and_store():
         })
 
     writer.commit()
+    time.sleep(1)
     return results
 
 def search_publications(query):

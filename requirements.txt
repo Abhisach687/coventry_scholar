@@ -2,3 +2,5 @@ flask
 beautifulsoup4
 whoosh
 requests
+robotexclusionrulesparser
+APScheduler
